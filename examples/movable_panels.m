@@ -32,25 +32,24 @@ normals_base_paper = [1, 1, 1, 1;
 
 
 %% Create rotation matrices for each panel
-% Panel 1 (left): Rotation around y-axis (pitch movement)
-R1 = [cos(eta1), 0, sin(eta1);
-      0,         1, 0;
-      -sin(eta1), 0, cos(eta1)];
-
-% Panel 2 (top): Rotation around z-axis (yaw movement)  
-R2 = [cos(eta2), -sin(eta2), 0;
-      sin(eta2),  cos(eta2), 0;
+% Panel 1 (left): Rotation around z-axis
+R1 = [cos(eta1), -sin(eta1), 0;
+      sin(eta1),  cos(eta1), 0;
       0,         0,         1];
 
-% Panel 3 (right): Rotation around y-axis (pitch movement)
-R3 = [cos(eta3), 0, sin(eta3);
+% Panel 2 (bottom): Rotation around y-axis
+R2 = [cos(eta2), 0, sin(eta2);
       0,         1, 0;
-      -sin(eta3), 0, cos(eta3)];
+      -sin(eta2), 0, cos(eta2)];
 
-% Panel 4 (bottom): Rotation around z-axis (yaw movement)
-R4 = [cos(eta4), -sin(eta4), 0;
-      sin(eta4),  cos(eta4), 0;
+% Panel 3 (right): Rotation around z-axis 
+R3 = [cos(eta3), -sin(eta3), 0;
+      sin(eta3),  cos(eta3), 0;
       0,         0,         1];
+% Panel 4 (top): Rotation around y-axis 
+R4 = [cos(eta4), 0, sin(eta4);
+      0,         1, 0;
+      -sin(eta4), 0, cos(eta4)];
 
 %% Apply rotations to create moveable panel normals
 normals_wings_paper_movable = sym(zeros(3,4));
