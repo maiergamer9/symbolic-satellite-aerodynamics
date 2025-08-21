@@ -21,54 +21,24 @@ bus = saero.geometry.shapes.Box(l, w, h, [0;0;0]);
 
 %% Wing panel base configuration
 % Base center of pressure positions (fixed attachment points)
-cop_wings_base = [-l/2, -l/2, -l/2, -l/2;
-                 -d, 0, d, 0;
-                  0, d, 0, -d];
+cop_wings_base = [-l/2           , -l/2            , -l/2              , -l/2              ; ...
+                 l/2 + d + l_w /2, 0               ,    -l/2 -d -l_w /2, 0                 ; ... 
+                  0              , l/2 + d + l_w /2, 0                 , -l/2 -d -l_w /2  ];
 
-% Base normals for paper satellite (all initially pointing in +x direction)
-normals_base_paper = [1, 1, 1, 1;
-                      0, 0, 0, 0;
-                      0, 0, 0, 0];
+normals_wings_paper_movable = [cos(eta1) , cos(eta2), cos(eta3), cos(eta4) ; ...
+                               -sin(eta1), 0        , sin(eta3), 0         ; ...
+                               0         ,-sin(eta2), 0        , sin(eta4)];
 
-
-%% Create rotation matrices for each panel
-% Panel 1 (left): Rotation around z-axis
-R1 = [cos(eta1), -sin(eta1), 0;
-      sin(eta1),  cos(eta1), 0;
-      0,         0,         1];
-
-% Panel 2 (bottom): Rotation around y-axis
-R2 = [cos(eta2), 0, sin(eta2);
-      0,         1, 0;
-      -sin(eta2), 0, cos(eta2)];
-
-% Panel 3 (right): Rotation around z-axis 
-R3 = [cos(eta3), -sin(eta3), 0;
-      sin(eta3),  cos(eta3), 0;
-      0,         0,         1];
-% Panel 4 (top): Rotation around y-axis 
-R4 = [cos(eta4), 0, sin(eta4);
-      0,         1, 0;
-      -sin(eta4), 0, cos(eta4)];
-
-%% Apply rotations to create moveable panel normals
-normals_wings_paper_movable = sym(zeros(3,4));
-%Calculate the new normals for each panel after rotation
-normals_wings_paper_movable(:, 1) = R1 * normals_base_paper(:, 1);
-normals_wings_paper_movable(:, 2) = R2 * normals_base_paper(:, 2);
-normals_wings_paper_movable(:, 3) = R3 * normals_base_paper(:, 3);
-normals_wings_paper_movable(:, 4) = R4 * normals_base_paper(:, 4);
-
-%% Create moveable COP positions
-cop_wings_movable = sym(zeros(3,4));
-% Calculate the new center of pressure positions for each panel
-cop_wings_movable(:, 1) = R1 * cop_wings_base(:, 1);
-cop_wings_movable(:, 2) = R2 * cop_wings_base(:, 2); 
-cop_wings_movable(:, 3) = R3 * cop_wings_base(:, 3); 
-cop_wings_movable(:, 4) = R4 * cop_wings_base(:, 4);
+cop_wings_movable = [-l/2*cos(eta1) + d*sin(eta1),-l/2*cos(eta2) - d*sin(eta2),-l/2*cos(eta3) - d*sin(eta3) , -l/2*cos(eta4) + d*sin(eta4)  ; ...
+                     -d*cos(eta1) - l/2*sin(eta1), 0                          ,  d*cos(eta3) - l/2*sin(eta3),  0                            ; ...
+                     0                           , d*cos(eta2) - l/2*sin(eta2),  0                          , -d*cos(eta4) - l/2*sin(eta4) ];
+% alt
+% cop_wings_movable = [  d*sin(eta1) - (l*cos(eta1))/2, d*sin(eta2) - (l*cos(eta2))/2, - (l*cos(eta3))/2 - d*sin(eta3), - (l*cos(eta4))/2 - d*sin(eta4); ...
+%                       - d*cos(eta1) - (l*sin(eta1))/2,                             0,   d*cos(eta3) - (l*sin(eta3))/2,                              0; ...
+%                               0, d*cos(eta2) + (l*sin(eta2))/2,                               0,   (l*sin(eta4))/2 - d*cos(eta4)];
 
 %% Symbolic wing areas
-wings_areas = l_w*w_w*ones(1,4);
+wings_areas = w_w*l_w*ones(1,4);
 
 %% Create panel groups with moveable panels
 wings_paper_movable = saero.geometry.PanelGroup(cop_wings_movable, ...
@@ -93,4 +63,11 @@ torqueExpr_paper_movable = sat_paper_movable.get_total_aerodynamic_torque(incomi
 %% Create MATLAB function handles for numerical evaluation
 forceFun_paper = matlabFunction(forceExpr_paper_movable);
 torqueFun_paper = matlabFunction(torqueExpr_paper_movable);
-
+% eta_c = casadi.SX.sym('eta', 4, 1);
+% vi_c = casadi.SX.sym('vi', 3, 1);
+% torqueFun_paper(0.45, eta_c(1), eta_c(2), eta_c(3), eta_c(4), 0.4, 0.4, 0.275, vi_c(1), vi_c(2), vi_c(3), 0.4, 0.39);
+% vi = incoming_velocity;
+% torque0 = torqueFun_paper(0.45,deg2rad(-40), deg2rad(-40), deg2rad(-40), deg2rad(40), 0.4, 0.4, 0.39, vi(1), vi(2), vi(3), 0.4, 0.275);
+% mustBeZero = [torque0; incoming_velocity'*incoming_velocity-1];
+% mustBeZeroFun = matlabFunction(mustBeZero)
+% v0 = fzero(mustBeZeroFun, [[],1])
