@@ -27,10 +27,12 @@ torque_expr = torqueExpr_paper_movable;
 force_expr = subs(force_expr, [l, w, h, d, l_w, w_w], [0.4, 0.4, 0.4, 0.45, 0.275, 0.39]);
 torque_expr = subs(torque_expr, [l, w, h, d, l_w, w_w], [0.4, 0.4, 0.4, 0.45, 0.275, 0.39]);
 
+% In Matlab-Function ändern!!!
 % Substitute panel angles
 force_expr = subs(force_expr, [eta1, eta2, eta3, eta4], [eta1_test, eta2_test, eta3_test, eta4_test]);
 torque_expr = subs(torque_expr, [eta1, eta2, eta3, eta4], [eta1_test, eta2_test, eta3_test, eta4_test]);
 
+% In Matlab-Function ändern!!!
 % Substitute incoming velocity
 force_expr = subs(force_expr, incoming_velocity, vi_test);
 torque_expr = subs(torque_expr, incoming_velocity, vi_test);
